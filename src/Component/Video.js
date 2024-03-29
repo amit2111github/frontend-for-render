@@ -11,7 +11,7 @@ import "font-awesome/css/font-awesome.min.css";
 import Messenger from "./videocomponent/Massenger";
 import MessangerHeader from "./videocomponent/MessangerHeader";
 
-console.log(SOCKET_URL);
+// console.log(SOCKET_URL);
 const Video = () => {
   const [message, setMessage] = useState("");
   const [peer, setPeer] = useState(false);
@@ -45,19 +45,21 @@ const Video = () => {
 
   // socket connection
   useEffect(() => {
-    const temp_socket = io(SOCKET_URL || "http://localhost:3000", {
+    const temp_socket = io(process.env.REACT_APP_API, {
       query: {
         id: user._id,
       },
     });
     setSocket(temp_socket);
     let tempPeer = new Peer();
-    tempPeer.on("open" , id =>{
-      console.log("is id "  + id);
-      temp_socket.emit("peerId" , {userId : user._id , peerId : id});
-    })
+    tempPeer.on("open", (id) => {
+      console.log("is id " + id);
+      temp_socket.emit("peerId", { userId: user._id, peerId: id });
+    });
     setPeer(tempPeer);
-    window?.navigator?.mediaDevices?.getUserMedia({ audio: true, video: true }).then((stream) => {
+    window?.navigator?.mediaDevices
+      ?.getUserMedia({ audio: true, video: true })
+      .then((stream) => {
         console.log(stream);
         setStream(stream);
         myVideoRef.current.srcObject = stream;
@@ -169,14 +171,15 @@ const Video = () => {
   };
   const makeCall = (event) => {
     // console.log("make call");
-    socket.emit("getPeerId" , {userId : secondUser._id , myId : user._id});
-    socket.on("getPeerId" , ({error , peerId , myId})  => {
+    socket.emit("getPeerId", { userId: secondUser._id, myId: user._id });
+    socket.on("getPeerId", ({ error, peerId, myId }) => {
       console.log("GOT RESPONSE");
-      console.log(myId)
-      if(myId !== user._id) return;
-      if(error) alert(error);
+      console.log(myId);
+      if (myId !== user._id) return;
+      if (error) alert(error);
       else {
-        const callRequest = peer.call(peerId, stream);    
+        console.log("just called");
+        const callRequest = peer.call(peerId, stream);
         setPersonOnCall(secondUser);
         callRequest.on("stream", (friendVide) => {
           setcallAccepted(true);
@@ -187,7 +190,7 @@ const Video = () => {
         setPersonWhoIsCalling(user);
         socket.emit("callmaking", { callTo: secondUser, callBy: user });
       }
-    })
+    });
   };
 
   const answerCall = () => {

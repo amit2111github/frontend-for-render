@@ -1,4 +1,4 @@
-const API = "http://localhost:5000";
+const API = process.env.REACT_APP_API;
 export const getAllUser = async (user, token) => {
 	console.log(token);
 	try {

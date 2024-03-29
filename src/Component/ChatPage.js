@@ -50,7 +50,7 @@ const ChatPage = ({ history }) => {
     if (!myref || myref !== undefined) myref.current.focus();
   }, []);
   useEffect(() => {
-    const temp_socket = io(SOCKET_URL || "http://localhost:5000", {
+    const temp_socket = io(process.env.REACT_APP_API, {
       query: {
         id: user._id,
       },
